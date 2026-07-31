@@ -31,10 +31,39 @@ HELP
 }
 
 launch() {
+  mode=${1:-}
+
   printf '%s\n' 'NERV COMMAND CENTER'
   printf '%s\n' 'Initializing DJI-4G-Hub...'
-  printf '%s\n\n' 'Launch sequence initiated.'
-  exec "${DJONEHUB}" start "${1:-}"
+  printf '%s\n' 'Launch sequence initiated.'
+
+  if "${DJONEHUB}" status 2>/dev/null | grep -q '正在运行'; then
+    printf '%s\n' 'DJI-4G-Hub is already ONLINE.'
+    exit 0
+  fi
+
+  if [ "${mode}" = "--demo" ]; then
+    nohup "${DJONEHUB}" start --demo >/dev/null 2>&1 &
+  else
+    nohup "${DJONEHUB}" start >/dev/null 2>&1 &
+  fi
+
+  attempts=0
+  while [ "${attempts}" -lt 50 ]; do
+    if /usr/bin/curl -fsS --max-time 1 http://127.0.0.1:7575/ >/dev/null 2>&1; then
+      printf '%s\n' 'DJI-4G-Hub ........ ONLINE'
+      printf '%s\n' 'HTTP Interface .... SYNCHRONIZED'
+      printf '%s\n' 'Synchronization ... 100%'
+      printf '%s\n' '>>> LAUNCH COMPLETE <<<'
+      exit 0
+    fi
+
+    attempts=$((attempts + 1))
+    sleep 0.2
+  done
+
+  printf '%s\n' 'Launch failed: service did not become ready.' >&2
+  exit 1
 }
 
 shutdown() {
