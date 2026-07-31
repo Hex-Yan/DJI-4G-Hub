@@ -1,0 +1,92 @@
+#!/bin/sh
+set -u
+
+SCRIPT_DIR=$(CDPATH= cd -P -- "$(dirname -- "$0")" && pwd)
+
+if command -v djonehub >/dev/null 2>&1; then
+  DJONEHUB=$(command -v djonehub)
+elif [ -x "${SCRIPT_DIR}/djonehub" ]; then
+  DJONEHUB="${SCRIPT_DIR}/djonehub"
+else
+  printf 'NERV ERROR：找不到 djonehub 控制程序。\n' >&2
+  exit 1
+fi
+
+usage() {
+  cat <<'HELP'
+NERV COMMAND CENTER
+DJI-4G-Hub Control Interface
+
+用法：
+  nerv launch           启动服务并打开管理网页
+  nerv launch --demo    启动无硬件演示模式
+  nerv shutdown         关闭服务
+  nerv restart          重启服务
+  nerv status           查看运行状态
+  nerv sync             查看连接状态
+  nerv logs             查看实时日志
+  nerv open             打开管理网页
+  nerv help             显示帮助
+HELP
+}
+
+launch() {
+  printf '%s\n' 'NERV COMMAND CENTER'
+  printf '%s\n' 'Initializing DJI-4G-Hub...'
+  printf '%s\n\n' 'Launch sequence initiated.'
+  exec "${DJONEHUB}" start "${1:-}"
+}
+
+shutdown() {
+  printf '%s\n' 'NERV COMMAND CENTER'
+  printf '%s\n' 'Emergency restraint system engaged.'
+  "${DJONEHUB}" stop
+}
+
+restart() {
+  printf '%s\n' 'NERV COMMAND CENTER'
+  printf '%s\n' 'Restart sequence initiated.'
+  "${DJONEHUB}" stop
+  sleep 1
+  exec "${DJONEHUB}" start
+}
+
+status() {
+  printf '%s\n' 'NERV SYSTEM STATUS'
+  printf '%s\n' '------------------------------'
+  "${DJONEHUB}" status
+}
+
+sync_status() {
+  printf '%s\n' 'NERV SYNCHRONIZATION STATUS'
+  printf '%s\n' '------------------------------'
+
+  if /usr/bin/curl -fsS --max-time 2 http://127.0.0.1:7575/ >/dev/null 2>&1; then
+    printf '%s\n' 'DJI-4G-Hub ........ ONLINE'
+    printf '%s\n' 'HTTP Interface .... SYNCHRONIZED'
+    printf '%s\n' 'Endpoint .......... 127.0.0.1:7575'
+    printf '%s\n' 'Synchronization ... 100%'
+  else
+    printf '%s\n' 'DJI-4G-Hub ........ OFFLINE'
+    printf '%s\n' 'HTTP Interface .... NOT SYNCHRONIZED'
+    printf '%s\n' 'Synchronization ... 0%'
+    exit 1
+  fi
+}
+
+case "${1:-}" in
+  launch)
+    case "${2:-}" in
+      ""|--demo) launch "${2:-}" ;;
+      *) usage; exit 2 ;;
+    esac
+    ;;
+  shutdown) shutdown ;;
+  restart) restart ;;
+  status) status ;;
+  sync) sync_status ;;
+  logs) exec "${DJONEHUB}" logs ;;
+  open) exec "${DJONEHUB}" open ;;
+  help|-h|--help|"") usage ;;
+  *) usage; exit 2 ;;
+esac
