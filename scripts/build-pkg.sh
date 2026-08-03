@@ -10,15 +10,31 @@ DERIVED_DATA="${ROOT_DIR}/dist/DerivedData-PKG"
 APP_SOURCE="${DERIVED_DATA}/Build/Products/Release/DJI 4G Hub.app"
 
 BACKEND_DIR="${ROOT_DIR}/dist/release/DJOneHub-macOS-arm64-dev"
+
+WATCHER_SOURCE="${ROOT_DIR}/macos/DJI4GHubUSBWatcher/main.swift"
+WATCHER_BUILD="${ROOT_DIR}/dist/tools/dji4ghub-usb-watcher"
+LAUNCH_AGENT_SOURCE="${ROOT_DIR}/packaging/launchagents/com.hexyan.dji4ghub.usbwatcher.plist"
+
 PKG_ROOT="${ROOT_DIR}/dist/pkgroot"
 PKG_DIR="${ROOT_DIR}/dist/pkg"
 COMPONENT_PKG="${PKG_DIR}/DJI-4G-Hub-component.pkg"
 PKG_PATH="${PKG_DIR}/DJI-4G-Hub-${VERSION}.pkg"
+
 DISTRIBUTION="${ROOT_DIR}/packaging/Distribution.xml"
 PRODUCT_RESOURCES="${ROOT_DIR}/packaging/product-resources"
+PKG_SCRIPTS="${ROOT_DIR}/packaging/scripts"
 
 echo "==> 构建后台发行包"
 "${ROOT_DIR}/scripts/package-macos-arm64.sh"
+
+echo "==> 构建 USB Watcher"
+mkdir -p "$(dirname "${WATCHER_BUILD}")"
+
+xcrun swiftc \
+  "${WATCHER_SOURCE}" \
+  -framework AppKit \
+  -framework IOKit \
+  -o "${WATCHER_BUILD}"
 
 echo "==> 构建 Release App"
 rm -rf "${DERIVED_DATA}"
@@ -44,12 +60,24 @@ if [ ! -x "${BACKEND_DIR}/nerv" ] || \
   exit 1
 fi
 
+if [ ! -x "${WATCHER_BUILD}" ]; then
+  echo "错误：USB Watcher 未成功构建。" >&2
+  exit 1
+fi
+
+if [ ! -f "${LAUNCH_AGENT_SOURCE}" ]; then
+  echo "错误：缺少 LaunchAgent：${LAUNCH_AGENT_SOURCE}" >&2
+  exit 1
+fi
+
 echo "==> 组装 PKG 根目录"
 rm -rf "${PKG_ROOT}"
+
 mkdir -p \
   "${PKG_ROOT}/Applications" \
   "${PKG_ROOT}/usr/local/libexec/djonehub" \
   "${PKG_ROOT}/usr/local/bin" \
+  "${PKG_ROOT}/Library/LaunchAgents" \
   "${PKG_DIR}"
 
 ditto \
@@ -59,6 +87,18 @@ ditto \
 ditto \
   "${BACKEND_DIR}" \
   "${PKG_ROOT}/usr/local/libexec/djonehub"
+
+cp "${WATCHER_BUILD}" \
+  "${PKG_ROOT}/usr/local/libexec/djonehub/dji4ghub-usb-watcher"
+
+chmod 755 \
+  "${PKG_ROOT}/usr/local/libexec/djonehub/dji4ghub-usb-watcher"
+
+cp "${LAUNCH_AGENT_SOURCE}" \
+  "${PKG_ROOT}/Library/LaunchAgents/com.hexyan.dji4ghub.usbwatcher.plist"
+
+chmod 644 \
+  "${PKG_ROOT}/Library/LaunchAgents/com.hexyan.dji4ghub.usbwatcher.plist"
 
 ln -sfn \
   ../libexec/djonehub/nerv \
@@ -73,6 +113,7 @@ rm -f "${COMPONENT_PKG}" "${PKG_PATH}"
 
 pkgbuild \
   --root "${PKG_ROOT}" \
+  --scripts "${PKG_SCRIPTS}" \
   --identifier com.hexyan.dji4ghub \
   --version "${VERSION}" \
   --install-location / \
