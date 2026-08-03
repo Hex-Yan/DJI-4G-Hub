@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		85827CBC301CA41500AB7667 /* DJI 4G Hub App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJI 4G Hub App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		85827CBC301CA41500AB7667 /* DJI 4G Hub App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DJI 4G Hub.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -50,7 +50,7 @@
 /* Begin PBXNativeTarget section */
 		85827CBB301CA41500AB7667 /* DJI 4G Hub App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 85827CC7301CA41600AB7667 /* Build configuration list for PBXNativeTarget "DJI 4G Hub App" */;
+			buildConfigurationList = 85827CC7301CA41600AB7667 /* Build configuration list for PBXNativeTarget "DJI 4G Hub" */;
 			buildPhases = (
 				85827CB8301CA41500AB7667 /* Sources */,
 				85827CB9301CA41500AB7667 /* Frameworks */,
@@ -63,10 +63,10 @@
 			fileSystemSynchronizedGroups = (
 				85827CBE301CA41500AB7667 /* DJI4GHub */,
 			);
-			name = "DJI 4G Hub App";
+			name = "DJI 4G Hub";
 			packageProductDependencies = (
 			);
-			productName = "DJI 4G Hub App";
+			productName = "DJI 4G Hub";
 			productReference = 85827CBC301CA41500AB7667 /* DJI 4G Hub App.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -345,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		85827CC7301CA41600AB7667 /* Build configuration list for PBXNativeTarget "DJI 4G Hub App" */ = {
+		85827CC7301CA41600AB7667 /* Build configuration list for PBXNativeTarget "DJI 4G Hub" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				85827CC8301CA41600AB7667 /* Debug */,
