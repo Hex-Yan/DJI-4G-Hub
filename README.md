@@ -1,4 +1,4 @@
-<img width="1024" height="1024" alt="EIEO+4G" src="https://github.com/user-attachments/assets/cc57960c-9b49-4dbb-96bb-0ea439ffef6b" /><img width="1024" height="1024" alt="EIEO+4G" src="https://github.com/user-attachments/assets/f35cad92-e8ac-4590-a4b7-3d0f2ac8566a" />
+<img width="1024" height="1024" alt="EIEO+4G" src="https://github.com/user-attachments/assets/cc57960c-9b49-4dbb-96bb-0ea439ffef6b" />
 <p align="center">
   <img src="docs/images/DJI4GHub-logo.png" width="220" alt="DJI 4G Hub">
 </p>
