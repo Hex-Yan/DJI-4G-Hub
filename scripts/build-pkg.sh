@@ -12,7 +12,10 @@ APP_SOURCE="${DERIVED_DATA}/Build/Products/Release/DJI 4G Hub.app"
 BACKEND_DIR="${ROOT_DIR}/dist/release/DJOneHub-macOS-arm64-dev"
 PKG_ROOT="${ROOT_DIR}/dist/pkgroot"
 PKG_DIR="${ROOT_DIR}/dist/pkg"
+COMPONENT_PKG="${PKG_DIR}/DJI-4G-Hub-component.pkg"
 PKG_PATH="${PKG_DIR}/DJI-4G-Hub-${VERSION}.pkg"
+DISTRIBUTION="${ROOT_DIR}/packaging/Distribution.xml"
+PRODUCT_RESOURCES="${ROOT_DIR}/packaging/product-resources"
 
 echo "==> 构建后台发行包"
 "${ROOT_DIR}/scripts/package-macos-arm64.sh"
@@ -65,14 +68,21 @@ ln -sfn \
   ../libexec/djonehub/djonehub \
   "${PKG_ROOT}/usr/local/bin/djonehub"
 
-echo "==> 生成 PKG"
-rm -f "${PKG_PATH}"
+echo "==> 生成组件包"
+rm -f "${COMPONENT_PKG}" "${PKG_PATH}"
 
 pkgbuild \
   --root "${PKG_ROOT}" \
   --identifier com.hexyan.dji4ghub \
   --version "${VERSION}" \
   --install-location / \
+  "${COMPONENT_PKG}"
+
+echo "==> 生成带欢迎页的最终 PKG"
+productbuild \
+  --distribution "${DISTRIBUTION}" \
+  --resources "${PRODUCT_RESOURCES}" \
+  --package-path "${PKG_DIR}" \
   "${PKG_PATH}"
 
 echo

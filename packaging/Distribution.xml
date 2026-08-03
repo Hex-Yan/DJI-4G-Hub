@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<installer-gui-script minSpecVersion="2">
+
+  <title>DJI 4G Hub</title>
+
+  <welcome file="Welcome.html"/>
+
+  <background
+    file="InstallerBackground.png"
+    alignment="top"
+    scaling="none"/>
+
+  <options
+    customize="never"
+    hostArchitectures="arm64"/>
+
+  <choices-outline>
+    <line choice="default"/>
+  </choices-outline>
+
+  <choice id="default" visible="false">
+    <pkg-ref id="com.hexyan.dji4ghub"/>
+  </choice>
+
+  <pkg-ref
+    id="com.hexyan.dji4ghub"
+    version="1.0.0">
+    DJI-4G-Hub-component.pkg
+  </pkg-ref>
+
+</installer-gui-script>
