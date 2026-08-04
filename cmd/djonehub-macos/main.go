@@ -86,6 +86,11 @@ type app struct {
 	usbATBackoffUntil time.Time
 	usbATBackoffErr   string
 
+	ecmBootstrapMu          sync.Mutex
+	ecmBootstrapInProgress  bool
+	ecmBootstrapLastAttempt time.Time
+	ecmBootstrapLastResult  string
+
 	smsMu          sync.RWMutex
 	sms            []receivedSMS
 	smsSendMu      sync.Mutex
@@ -356,6 +361,7 @@ func serve(instance *app, listen string) {
 	defer stop()
 	if !instance.demo {
 		go instance.startCellularPolicyGuard(ctx)
+		go instance.startAutoECMBootstrap(ctx)
 	}
 
 	if !instance.demo {
