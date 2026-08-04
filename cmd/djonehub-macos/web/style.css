@@ -121,6 +121,11 @@ button:active:not(:disabled) { transform: translateY(1px); }
 .hardware-details p { overflow-wrap: anywhere; font-size: 13px; }
 .hardware-details small { display: block; margin-top: 7px; color: #7b8797; font-size: 12px; line-height: 1.45; }
 .inline-status { margin: 8px 0 13px; color: #788598; font-size: 13px; }
+.inline-status[data-tone="good"] { color: #15803d; }
+.inline-status[data-tone="info"] { color: #2563eb; }
+.inline-status[data-tone="warn"] { color: #b45309; }
+.inline-status[data-tone="bad"] { color: #dc2626; }
+.inline-status[data-tone="muted"] { color: #788598; }
 #workmode-status { padding: 9px 12px; border-left: 2px solid #4f83e7; background: #f1f6ff; }
 
 .call-panel { margin-top: 14px; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
