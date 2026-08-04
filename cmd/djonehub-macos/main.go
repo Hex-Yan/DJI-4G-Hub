@@ -742,6 +742,8 @@ func (a *app) routes() http.Handler {
 	mux.HandleFunc("GET /api/calls/status", a.callStatus)
 	mux.HandleFunc("POST /api/calls/reject", a.rejectCall)
 	mux.HandleFunc("POST /api/at", a.executeAT)
+	mux.HandleFunc("GET /api/module/ecm-status", a.ecmStatus)
+	mux.HandleFunc("POST /api/module/initialize-ecm", a.initializeECM)
 	mux.HandleFunc("GET /api/network", a.networkDiagnostic)
 	mux.HandleFunc("GET /api/network/traffic", a.networkTraffic)
 	mux.HandleFunc("GET /api/network/cellular-policy", a.getCellularPolicy)
