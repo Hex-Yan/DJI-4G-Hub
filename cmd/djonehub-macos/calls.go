@@ -106,7 +106,7 @@ func (a *app) pollCallOnce() error {
 		return nil
 	}
 	if a.modem == nil && a.currentUSBDevice() == nil {
-		a.setCallPollStatus(fmt.Errorf("DJI USB device is not connected"))
+		a.setCallPollStatus(errDJIUSBNotConnected)
 		return nil
 	}
 

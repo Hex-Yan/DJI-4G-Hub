@@ -22,3 +22,7 @@ backups/
 
 # Frontend dependencies are not used by the native DJOneHub page
 node_modules/
+
+# Xcode user-specific files
+xcuserdata/
+*.xcuserstate

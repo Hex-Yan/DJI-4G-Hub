@@ -8,6 +8,8 @@ let networkTrafficInFlight = false;
 let callPollInFlight = false;
 let lastActiveCallID = null;
 let cellularPolicyBusy = false;
+let moduleInitPollTimer = null;
+let moduleInitInFlight = false;
 
 function setThemePreference(theme) {
   if (theme === "light" || theme === "dark") {
@@ -256,6 +258,68 @@ function signalTone(dbm) {
   if (value >= -85) return "warn";
   if (value >= -95) return "orange";
   return "bad";
+}
+
+function moduleInitializationCopy(status) {
+  const phase = status?.initialization_status || "disconnected";
+  const error = status?.initialization_error || status?.reason || "";
+  switch (phase) {
+    case "detected":
+      if (status?.usbnet_mode === "0" || status?.needs_initialization) {
+        return "发现新的 DJI 第一代 4G 模块";
+      }
+      return status?.initialization_message || "发现新的 DJI 第一代 4G 模块";
+    case "checking":
+      return "正在检查模块 ECM 状态";
+    case "initializing":
+      return "正在启用 ECM";
+    case "rebooting":
+      return "正在等待模块重启";
+    case "ready":
+      return "模块已准备完成";
+    case "failed":
+      return `初始化失败${error ? `：${error}` : ""}`;
+    case "disconnected":
+    default:
+      return status?.initialization_message || "未检测到 DJI 第一代 4G 模块";
+  }
+}
+
+function moduleInitializationTone(status) {
+  switch (status?.initialization_status) {
+    case "ready": return "good";
+    case "initializing":
+    case "rebooting":
+    case "checking": return "info";
+    case "detected": return status?.needs_initialization ? "warn" : "muted";
+    case "failed": return "bad";
+    default: return "muted";
+  }
+}
+
+async function loadECMStatus() {
+  if (moduleInitInFlight) return;
+  moduleInitInFlight = true;
+  try {
+    const status = await api("/api/module/ecm-status");
+    const el = $("#module-init-status");
+    el.textContent = moduleInitializationCopy(status);
+    el.dataset.tone = moduleInitializationTone(status);
+    const active = ["checking", "initializing", "rebooting"].includes(status.initialization_status);
+    scheduleModuleInitializationPolling(active ? 1500 : 6000);
+  } catch (error) {
+    const el = $("#module-init-status");
+    el.textContent = `初始化状态读取失败：${error.message}`;
+    el.dataset.tone = "bad";
+    scheduleModuleInitializationPolling(6000);
+  } finally {
+    moduleInitInFlight = false;
+  }
+}
+
+function scheduleModuleInitializationPolling(delayMS) {
+  clearTimeout(moduleInitPollTimer);
+  moduleInitPollTimer = setTimeout(loadECMStatus, delayMS);
 }
 
 async function loadStatus() {
@@ -1095,7 +1159,7 @@ $("#at-form").addEventListener("submit", async (event) => {
 });
 
 $("#refresh").addEventListener("click", async () => {
-  await Promise.all([loadStatus(), loadSMS()]);
+  await Promise.all([loadStatus(), loadSMS(), loadECMStatus()]);
   notice("状态已刷新");
 });
 $("#refresh-sms").addEventListener("click", async () => {
@@ -1159,6 +1223,7 @@ $("#reject-call").addEventListener("click", async () => {
 });
 
 loadStatus();
+loadECMStatus();
 loadSMS();
 loadCalls();
 loadCellularPolicy();

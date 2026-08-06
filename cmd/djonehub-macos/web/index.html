@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DJOneHub for macOS</title>
+  <title>DJI 4G Hub</title>
   <script>
     try {
       const theme = localStorage.getItem("djonehub-theme") || localStorage.getItem("vohive-theme");
@@ -16,7 +16,7 @@
   <header class="app-header">
     <div class="brand-block">
       <div class="brand-line"><span class="brand-mark" aria-hidden="true"></span><span class="eyebrow">DJI 4G MODULE</span></div>
-      <h1>DJOneHub <span>macOS</span></h1>
+      <h1>DJI 4G Hub</h1>
       <p id="device-summary">正在连接大疆 4G 模块</p>
     </div>
     <div class="header-actions">
@@ -54,6 +54,7 @@
       </div>
     </section>
     <section id="hardware-details" class="hardware-details" hidden></section>
+    <p id="module-init-status" class="inline-status">正在检查模块初始化状态</p>
     <p id="workmode-status" class="inline-status" hidden></p>
 
     <section id="call-panel" class="call-panel" aria-live="polite">
